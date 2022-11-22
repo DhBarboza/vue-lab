@@ -7,6 +7,15 @@
     </nav>
 
     <div class="container">
+
+      <!--
+      <ul>
+        <li v-for="(erro, index) of errors" :key="index">
+          label <b>{{ erro.field }}</b> - {{ erro.defaultMessage}}
+        </li>
+      </ul>
+      -->
+
       <form @submit.prevent="saveMotor">
         <label>Modelo</label>
         <input type="text" placeholder="Modelo" v-model="motorcycle.modelo" />
@@ -55,7 +64,7 @@
             <td>{{ motorcycle.cor }}</td>
             <td>{{ motorcycle.responsavel }}</td>
             <td>
-              <button class="waves-effect btn-small blue darken-1">
+              <button @click="editMotor(motorcycle)" class="waves-effect btn-small blue darken-1">
                 <i class="material-icons">create</i>
               </button>
               <button class="waves-effect btn-small red darken-1">
@@ -76,6 +85,7 @@ export default {
   data() {
     return {
       motorcycle: {
+        id: "",
         modelo: "",
         ano: "",
         placa: "",
@@ -84,6 +94,7 @@ export default {
         responsavel: "",
       },
       motorcycles: [],
+      //errors: []
     };
   },
   mounted() {
@@ -100,10 +111,35 @@ export default {
     },
     
     saveMotor() {
-      MotorCycle.saveItem(this.motorcycle).then(() => {
+      if(!this.motorcycle.id){
+        MotorCycle.saveItem(this.motorcycle).then(() => {
+        this.motorcycle = {}
         alert("Salvo com sucesso")
         this.getMotor()
-      });
+      }).catch(e =>{
+        console.log(e)
+      })
+      } else {
+        MotorCycle.updateItem(this.motorcycle.id).then(() => {
+        this.motorcycle = {}
+        alert("Atualizado com sucesso")
+        this.getMotor()
+      }).catch(e =>{
+        console.log(e)
+      })
+
+      }
+      
+    },
+
+    editMotor(motorcycle){
+      this.motorcycle = motorcycle
+    },
+
+    removeItem(id){
+      MotorCycle.deleteItem(id).then(() =>{
+        this.getMotor()
+      })
     },
   },
 };
